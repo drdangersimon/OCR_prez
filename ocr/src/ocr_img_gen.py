@@ -340,10 +340,12 @@ def make_nrc_training_imgs(text_list, max_repeats, out_shape, save_path):
         else:
             nrc = text
         for r in range(max_repeats):
-            img = make_nrc_text_box(out_shape[0], out_shape[1], nrc, fig)
+            img = make_nrc_text_box(out_shape[0], out_shape[1], nrc, fig)* -1
             # scale between 0,1
             img_std = (img - img.min()) / (img.max() - img.min())
             img_scaled = img_std * (1) + 0
+            # make text black
+            img_scaled = img_scaled
             img_path = os.path.join(save_path, '{}_{}.jpg'.format(file_number, r))
             skio.imsave(img_path, img_scaled)
             out_list_file.write('{}.jpg,{}\n'.format(img_path, nrc))
@@ -393,11 +395,9 @@ def make_stage_1_image(no_img, img_shape, save_path, valid_charaters, nchar=1):
         #  blur first
         # text_array = blur_img(text_array, abs(np.random.rand() * 1))
         # combine with noisy background
-        out_img = unitscale(background + text_array)
+        out_img = unitscale((background + text_array) * -1)
         sp = os.path.join(save_path, '{}.jpg'.format(i))
-        skio.imsav
-
-        e(sp, out_img)
+        skio.imsave(sp, out_img )
         out_list_file.write('{}.jpg,{}\n'.format(i, text))
 
 
@@ -405,7 +405,7 @@ if __name__ == '__main__':
     # make 3 stages of training images
     number_of_imgs = 5 * 10 ** 4
     out_shape = (64, 512)
-    outpath = os.environ['TRANING_PATH']
+    outpath = '/home/thuso/build/OCR_prez/training_data' #os.environ['TRANING_PATH']
     valid_charaters = list(map(str, range(10))) + ['/']
     ### Stage 1 ###
     # image with noise background and 1 character and blanks
@@ -413,7 +413,7 @@ if __name__ == '__main__':
     print(stage_1_path)
     if not os.path.exists(stage_1_path):
         os.mkdir(stage_1_path)
-    # make_stage_1_image(number_of_imgs, out_shape, stage_1_path, valid_charaters,8)
+    #make_stage_1_image(number_of_imgs, out_shape, stage_1_path, valid_charaters,8)
     ### Stage 2 ###
     stage_2_path = os.path.join(outpath, 'stage2')
     print(stage_2_path)

@@ -7,7 +7,7 @@ from keras.applications.vgg16 import VGG16
 from keras.models import Model
 from keras.optimizers import SGD
 
-from nrc_ocr.src.ctc_loss import ctc_network_metric as ctc_lambda_func
+from ocr.src.ctc_loss import ctc_network_metric as ctc_lambda_func
 
 
 def transfer_learn_ocr_model(img_shape, conv_filters, kernel_size, pool_size, time_dense_size, dropout, rnn_size,
