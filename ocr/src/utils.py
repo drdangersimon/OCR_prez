@@ -1,21 +1,22 @@
-import cv2
+import skimage.filters
+import skimage.io
+import skimage.transform
 import pylab as plt
 from scipy.misc import imresize
 
 
 def binarize_image(image):
     if len(image.shape) == 3:
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        gray = black_and_white(image)
     else:
         gray = image.copy()
-    gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-    return gray
+    thresh = skimage.filters.threshold_local(gray, 35)
+    binary = (gray <= thresh).astype(int)
+    return binary
 
 
 def rotate_image(image, degrees):
-    rows, cols = image.shape
-    M = cv2.getRotationMatrix2D((cols / 2, rows / 2), degrees, 1)
-    dst = cv2.warpAffine(image, M, (cols, rows))
+    dst = skimage.transform.rotate(image, degrees)
     return dst
 
 
@@ -66,7 +67,7 @@ class An():
         return self.fig, self.ax
 
     def _new_window(self):
-        self.window_gen = sliding_window(self.curent_image, 38, self.window_size)
+        self.window_gen = sliding_window(self.curent_image, 28, self.window_size)
 
     def _next_coord(self):
         try:
@@ -87,8 +88,9 @@ class An():
         x, y = self._next_coord()
         # plottting stuff
         #fig = line.get_figure()
-        #ax = fig.get_axes()[0]
-        #if len(ax.patches) > 0:
-        #    ax.patches.pop(0)
+        ax = self.ax
+        if len(ax.patches) > 0:
+            ax.patches.pop(0)
         line = plt.Rectangle((x, y), self.window_size[0], self.window_size[1], fill=False, ec='g', lw=5)
+        ax.add_patch(line)
         return (line,)
