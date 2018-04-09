@@ -26,6 +26,7 @@ def ctc_metric(args):
     the_input, labels, input_length, label_length = args
     # see what outputs of untrained model look like
     if K.backend() == 'theano':
+        # todo: make work
         ouput_func = K.function([model.input, K.learning_phase()], y_pred)
         y = ouput_func((a[0][attention_model.input.name], False))
         # make into tensors

@@ -5,7 +5,7 @@ if backend() != 'tensorflow':
     raise ImportError('Function requires tensorflow to work. Change keras backend')
 
 fit_chars = '0123456789/'
-        # decode output
+# decode output
 accepted_chars = dict(zip(list('0123456789/'), range(len(fit_chars))))
 # make blank char
 accepted_chars[''] = -1
@@ -18,13 +18,14 @@ def beamsearch_decode(ctc_ouput):
     :return: [batch, last str] decoded values
     """
     with K.tf.Session() as sess:
-        beam, prob = ctc_decode(ctc_ouput, [ctc_ouput.shape[1]] * ctc_ouput.shape[0], beam_width=50,
-                                  top_paths=1, greedy=False)
+        beam, prob = ctc_decode(ctc_ouput, [ctc_ouput.shape[1]] * ctc_ouput.shape[0], beam_width=len(fit_chars),
+                                top_paths=1, greedy=False)
         beam = beam[0].eval()
         prob = prob.eval()
     # turn into str
     out_str = list(map(labels_to_text, beam))
     return out_str, prob
+
 
 def nrc_output(decode_list):
     """
@@ -36,6 +37,7 @@ def nrc_output(decode_list):
     out_correct = []
     for row in decode_list:
         pass
+
 
 def text_to_labels(text):
     ret = []

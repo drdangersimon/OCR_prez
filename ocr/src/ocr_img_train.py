@@ -12,6 +12,7 @@ from keras import backend as K
 from pandas import get_dummies, read_csv
 from skimage import io
 from sklearn.model_selection import ShuffleSplit
+from .utils import binarize_image
 
 # mapper between labels and chars
 fit_chars = '0123456789/'
@@ -105,9 +106,9 @@ class ImageOCRGenerator(object):
         # convert to grey scale
         img_data = img_data.astype(np.float32) / 255
         if K.image_data_format() == 'channels_first':
-            X_data[:, 0, 0:self.img_w, :] = nomralize_img(img_data)
+            X_data[:, 0, 0:self.img_w, :] = 1 - np.stack(map(binarize_image,img_data))
         else:
-            X_data[:, 0:self.img_w, :, 0] = nomralize_img(img_data)
+            X_data[:, 0:self.img_w, :, 0] = 1 - np.stack(map(binarize_image,img_data)) 
         inputs = {'the_input': X_data,
                   'the_labels': labels,
                   'input_length': input_length,
