@@ -8,7 +8,7 @@ Gets to 99.25% test accuracy after 12 epochs
 from __future__ import print_function
 import keras
 import numpy as np
-from keras.datasets import mnist
+from ..src.ocr_img_gen import speckle
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
@@ -68,8 +68,8 @@ def process_data(x_train, x_test, y_train, y_test, num_classes=10):
         x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1)
     x_train = x_train.astype('float32')
     x_test = x_test.astype('float32')
-    x_train /= 255
-    x_test /= 255
+    # x_train /= 255
+    # x_test /= 255
 
     # convert class vectors to binary class matrices
     y_train = keras.utils.to_categorical(y_train, num_classes)
@@ -88,11 +88,15 @@ def single_image(x):
     x_out /= 255
     return x_out
 
-def add_noise():
-    null_class_train = int(x_train.shape[0] * .1)
-    empty = np.stack([255 * ocr_img_gen.speckle((28, 28), 1) for i in range(null_class_train)])
-    x_train = np.vstack((x_train, empty))
-    y_train = np.concatenate((y_train, 10 * np.ones(null_class_train)))
+
+def add_noise(image, labels):
+    null_class_train = int(image.shape[0] * .1)
+    # add noise to images
+    noise = np.stack([image[i].astype(float)/255. + speckle((image.shape[1], image.shape[2]),1) for i in range(image.shape[0])])
+    empty = np.stack([speckle((28, 28), 1) for i in range(null_class_train)])
+    out_image = np.vstack((noise, empty))
+    out_labels = np.concatenate((labels, 10 * np.ones(null_class_train)))
+    return out_image, out_labels
 
 
 def sliding_window(image, stepSize, windowSize):
